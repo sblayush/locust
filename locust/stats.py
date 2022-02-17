@@ -235,6 +235,10 @@ class StatsEntry:
         self.num_failures = 0
         """ Number of failed request """
         self.total_response_time = 0
+
+        """List of response times"""
+        self.response_times_list = []
+
         """ Total sum of the response times """
         self.min_response_time = None
         """ Minimum response time """
@@ -273,6 +277,7 @@ class StatsEntry:
         self.num_none_requests = 0
         self.num_failures = 0
         self.total_response_time = 0
+        self.response_times_list = []
         self.response_times = {}
         self.min_response_time = None
         self.max_response_time = 0
@@ -329,6 +334,9 @@ class StatsEntry:
             rounded_response_time = round(response_time, -2)
         else:
             rounded_response_time = round(response_time, -3)
+
+        # Adding response time to the response_time_list
+        self.response_times_list.append(response_time)
 
         # increase request count for the rounded key in response time dict
         self.response_times.setdefault(rounded_response_time, 0)
@@ -476,6 +484,7 @@ class StatsEntry:
             "num_failures": self.num_failures,
             "total_response_time": self.total_response_time,
             "max_response_time": self.max_response_time,
+            "response_times_list": self.response_times_list,
             "min_response_time": self.min_response_time,
             "total_content_length": self.total_content_length,
             "response_times": self.response_times,
@@ -494,6 +503,7 @@ class StatsEntry:
             "num_failures",
             "total_response_time",
             "max_response_time",
+            'response_times_list',
             "min_response_time",
             "total_content_length",
             "response_times",
@@ -820,6 +830,7 @@ class StatsCSV:
             "Failure Count",
             "Median Response Time",
             "Average Response Time",
+            "response_times_list"
             "Min Response Time",
             "Max Response Time",
             "Average Content Size",
@@ -867,6 +878,7 @@ class StatsCSV:
                         stats_entry.num_failures,
                         stats_entry.median_response_time,
                         stats_entry.avg_response_time,
+                        stats_entry.response_times_list,
                         stats_entry.min_response_time or 0,
                         stats_entry.max_response_time,
                         stats_entry.avg_content_length,
@@ -935,6 +947,7 @@ class StatsCSVFileWriter(StatsCSV):
             "Total Failure Count",
             "Total Median Response Time",
             "Total Average Response Time",
+            "Response Time",
             "Total Min Response Time",
             "Total Max Response Time",
             "Total Average Content Size",
@@ -1018,6 +1031,7 @@ class StatsCSVFileWriter(StatsCSV):
                         stats_entry.num_failures,
                         stats_entry.median_response_time,
                         stats_entry.avg_response_time,
+                        stats_entry.response_times_list[-1] if len(stats_entry.response_times_list)>0 else 0,
                         stats_entry.min_response_time or 0,
                         stats_entry.max_response_time,
                         stats_entry.avg_content_length,
