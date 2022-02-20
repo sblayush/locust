@@ -8,10 +8,12 @@ import os
 import csv
 import signal
 import gevent
+import json
 
 from .exception import StopUser, CatchResponseError
 
 import logging
+file = open('filename1.csv', 'w')
 
 console_logger = logging.getLogger("locust.stats_logger")
 
@@ -238,6 +240,7 @@ class StatsEntry:
 
         """List of response times"""
         self.response_times_list = []
+        self.timestamp_list = []
 
         """ Total sum of the response times """
         self.min_response_time = None
@@ -302,6 +305,9 @@ class StatsEntry:
         self._log_time_of_request(current_time)
         self._log_response_time(response_time)
 
+        # Adding response time to the response_time_list
+        file.write("{}, {}\n".format(current_time, response_time))
+
         # increase total content-length
         self.total_content_length += content_length
 
@@ -334,9 +340,6 @@ class StatsEntry:
             rounded_response_time = round(response_time, -2)
         else:
             rounded_response_time = round(response_time, -3)
-
-        # Adding response time to the response_time_list
-        self.response_times_list.append(response_time)
 
         # increase request count for the rounded key in response time dict
         self.response_times.setdefault(rounded_response_time, 0)
@@ -1056,6 +1059,7 @@ class StatsCSVFileWriter(StatsCSV):
         self.stats_history_csv_filehandle.close()
         self.failures_csv_filehandle.close()
         self.exceptions_csv_filehandle.close()
+        file.close()
 
     def stats_history_file_name(self):
         return self.base_filepath + "_stats_history.csv"
